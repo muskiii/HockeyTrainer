@@ -9,7 +9,12 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
 
-public class MainActivity extends Activity {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+public class MainActivity extends Activity implements Chronometer.OnChronometerTickListener{
 
     RelativeLayout rl;
     Chronometer mChronometer;
@@ -17,6 +22,9 @@ public class MainActivity extends Activity {
     private long mLastStopTime;
     private boolean running = false;
     private boolean stoped = true;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,6 +37,7 @@ public class MainActivity extends Activity {
         restart = (Button) findViewById(R.id.btnRestart);
 
         mChronometer = new Chronometer (MainActivity.this);
+        mChronometer.setOnChronometerTickListener(this);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams
                 ((int) LayoutParams.WRAP_CONTENT, (int) LayoutParams.WRAP_CONTENT);
@@ -76,5 +85,20 @@ public class MainActivity extends Activity {
                 stoped = false;
             }
         });
+    }
+
+    @Override
+    public void onChronometerTick(Chronometer chronometer) {
+//        if ("00:10".equals(chronometer.getText())){
+//            rl.setBackgroundColor(50);
+        Date date = null;
+        try {
+            date = sdf.parse((String) chronometer.getText());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long seconds = date.getTime() / 1000;
+        System.out.println(seconds);
+//        }
     }
 }
