@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">HockeyTrainer</string>
-    <string name="txtBtnStart">Start</string>
-    <string name="btnStop">stop</string>
-    <string name="btnRestart">restart</string>
-    <string name="btnClear">Clear</string>
+
+    <string name="app_name">Hockey Trainer</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="btnStartResume">Start/Resume</string>
+    <string name="btnRestart">Restart</string>
+
 </resources>
