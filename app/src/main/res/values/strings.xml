@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HockeyTrainer</string>
+    <string name="txtBtnStart">Start</string>
+    <string name="btnStop">stop</string>
+    <string name="btnRestart">restart</string>
+    <string name="btnClear">Clear</string>
+</resources>
