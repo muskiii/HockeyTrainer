@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/txtViewTitle"
         android:textColor="#C9FCE7"
-        android:textSize="40dp"
+        android:textSize="40sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -29,8 +29,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btnStartResume"
-            android:layout_alignBottom="@+id/btnRestart"
-            android:layout_centerHorizontal="true"
             android:layout_marginBottom="46dp"
             android:layout_weight="1" />
 
@@ -39,31 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btnRestart"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/btnStartResume"
-            android:layout_toStartOf="@+id/btnStartResume"
             android:layout_marginBottom="17dp"
             android:layout_weight="1" />
 
     </LinearLayout>
-
-    <!--<Button-->
-        <!--android:id="@+id/button4"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/btnRestart"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:text="Set Format" />-->
-
-    <!--<Button-->
-        <!--android:id="@+id/button5"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/button4"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:text="Clear Format" />-->
-
-
 </RelativeLayout>

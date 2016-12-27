@@ -18,12 +18,12 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
 
     RelativeLayout rl;
     Chronometer mChronometer;
-    Button start, stop, restart;
+    Button start, restart;
     private long mLastStopTime;
     private boolean running = false;
     private boolean stoped = true;
 
-    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
 
     @Override
@@ -43,16 +43,17 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
                 ((int) LayoutParams.WRAP_CONTENT, (int) LayoutParams.WRAP_CONTENT);
 
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        params.setMargins(0, 980, 0, 0);
+        params.setMargins(0, 500, 0, 0);
         mChronometer.setLayoutParams(params);
         mChronometer.setTextSize((float) 50);
 
-        rl.addView(mChronometer);
+//        rl.addView(mChronometer);
         restart.setEnabled(false);
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rl.addView(mChronometer);
                 // TODO Auto-generated method stub
                 if ( running == false ) {
                     mChronometer.setBase(SystemClock.elapsedRealtime());
@@ -99,6 +100,11 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
         }
         long seconds = date.getTime() / 1000;
         System.out.println(seconds);
-//        }
-    }
+        if(seconds%2== 0){
+            rl.setBackgroundColor(50);
+        }else{
+            rl.setBackgroundColor(260);
+        }
+        }
+//    }
 }
