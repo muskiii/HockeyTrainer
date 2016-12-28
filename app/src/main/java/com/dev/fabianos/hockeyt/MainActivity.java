@@ -1,42 +1,52 @@
 package com.dev.fabianos.hockeyt;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
-import java.util.TimeZone;
 
-public class MainActivity extends Activity implements Chronometer.OnChronometerTickListener {
+public class MainActivity extends AppCompatActivity implements Chronometer.OnChronometerTickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
+    public final int WAKE_LOCK = 0;
+    protected PowerManager.WakeLock mWakeLock;
     RelativeLayout rl;
     Chronometer mChronometer;
     Button start, restart;
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
     private long mLastStopTime;
     private boolean running = false;
     private boolean stoped = true;
-    protected PowerManager.WakeLock mWakeLock;
-    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-        this.mWakeLock.acquire();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, WAKE_LOCK);
+        } else {
+            //TODO
+            final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+            this.mWakeLock.acquire();
+        }
+
+
 
 
 
@@ -56,7 +66,6 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
         mChronometer.setLayoutParams(params);
         mChronometer.setTextSize((float) 50);
 
-//        rl.addView(mChronometer);
         restart.setEnabled(false);
         rl.addView(mChronometer);
 
@@ -64,18 +73,18 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                if (running == false) {
+                if (!running) {
                     mChronometer.setBase(SystemClock.elapsedRealtime());
                     mChronometer.start();
                     running = true;
                     stoped = false;
                     restart.setEnabled(true);
-                } else if (running == true && stoped == true) {
+                } else if (running && stoped) {
                     long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
                     mChronometer.setBase(mChronometer.getBase() + intervalOnPause);
                     mChronometer.start();
                     stoped = false;
-                } else if (running == true && stoped == false) {
+                } else if (running && !stoped) {
                     mChronometer.stop();
                     mLastStopTime = SystemClock.elapsedRealtime();
                     stoped = true;
@@ -98,8 +107,6 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
 
     @Override
     public void onChronometerTick(Chronometer chronometer) {
-//        if ("00:10".equals(chronometer.getText())){
-//            rl.setBackgroundColor(50);
         Random r = new Random();
         int high = 5;
         Date date = null;
@@ -133,5 +140,20 @@ public class MainActivity extends Activity implements Chronometer.OnChronometerT
     public void onDestroy() {
         this.mWakeLock.release();
         super.onDestroy();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case WAKE_LOCK:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    //TODO
+                    final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                    this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+                    this.mWakeLock.acquire();
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
