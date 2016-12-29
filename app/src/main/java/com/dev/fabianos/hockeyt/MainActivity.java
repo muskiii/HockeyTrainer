@@ -1,66 +1,57 @@
 package com.dev.fabianos.hockeyt;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+
 public class MainActivity extends AppCompatActivity implements Chronometer.OnChronometerTickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    public final int WAKE_LOCK = 0;
-    protected PowerManager.WakeLock mWakeLock;
     RelativeLayout rl;
     Chronometer mChronometer;
     Button start, restart;
-    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
     private long mLastStopTime;
     private boolean running = false;
     private boolean stoped = true;
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+    //    ---LOGGING---
+    private static final String TAG = "MyActivity";
+
+    MyContext myContext = new MyContext();
+    UntouchState untouchState = new UntouchState();
+    StartResumeState startResumeState = new StartResumeState();
+    StopedState stopedState = new StopedState();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        ---KEEP SCREEN ON---
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, WAKE_LOCK);
-        } else {
-            //TODO
-            final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-            this.mWakeLock.acquire();
-        }
-
-
-
-
-
+//        ---Views---
         rl = (RelativeLayout) findViewById(R.id.rl);
-
         start = (Button) findViewById(R.id.btnStartResume);
         restart = (Button) findViewById(R.id.btnRestart);
 
+//        ---DYNAMICALYL ADDED CHRONOMETER---
         mChronometer = new Chronometer(MainActivity.this);
         mChronometer.setOnChronometerTickListener(this);
-
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams
                 ((int) LayoutParams.WRAP_CONTENT, (int) LayoutParams.WRAP_CONTENT);
-
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         params.setMargins(0, 500, 0, 0);
         mChronometer.setLayoutParams(params);
@@ -69,42 +60,36 @@ public class MainActivity extends AppCompatActivity implements Chronometer.OnChr
         restart.setEnabled(false);
         rl.addView(mChronometer);
 
+
+//        --START ON CLICK---
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if (!running) {
-                    mChronometer.setBase(SystemClock.elapsedRealtime());
-                    mChronometer.start();
-                    running = true;
-                    stoped = false;
+                if (myContext.getState().getClass() == UntouchState.class) {
+                    untouchState.doAction(myContext, mChronometer);
                     restart.setEnabled(true);
-                } else if (running && stoped) {
+                } else if (myContext.getState().getClass() == StopedState.class) {
                     long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
                     mChronometer.setBase(mChronometer.getBase() + intervalOnPause);
-                    mChronometer.start();
-                    stoped = false;
-                } else if (running && !stoped) {
-                    mChronometer.stop();
+                    startResumeState.doAction(myContext, mChronometer);
+                } else if (myContext.getState().getClass() == StartResumeState.class) {
                     mLastStopTime = SystemClock.elapsedRealtime();
-                    stoped = true;
+                    stopedState.doAction(myContext, mChronometer);
                 }
             }
         });
 
+//        --RESTART ON CLICK---
         restart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
-                mChronometer.setBase(SystemClock.elapsedRealtime());
                 mLastStopTime = 0;
-                mChronometer.start();
-                running = true;
-                stoped = false;
+                untouchState.doAction(myContext, mChronometer);
             }
         });
     }
 
+    //    ---TO DO WHILE TICKING---
     @Override
     public void onChronometerTick(Chronometer chronometer) {
         Random r = new Random();
@@ -131,29 +116,102 @@ public class MainActivity extends AppCompatActivity implements Chronometer.OnChr
                     rl.setBackgroundColor(0xFF0040ff);
                     break;
                 case 4:
-                    rl.setBackgroundColor(0xFF000000);
+                    rl.setBackgroundColor(0xFFFFFFFF);
                     break;
             }
         }
     }
+
     @Override
     public void onDestroy() {
-        this.mWakeLock.release();
         super.onDestroy();
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case WAKE_LOCK:
-                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    //TODO
-                    final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                    this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-                    this.mWakeLock.acquire();
-                }
-                break;
-            default:
-                break;
-        }
-    }
+
+
+//    ------------------------------Example on managing permission---------------------------------
+// <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+//    private static final int REQUEST_WAKE_LOCK = 0;
+//    protected PowerManager.WakeLock mWakeLock;
+//    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKE_LOCK);
+//        } else {
+//            final PowerManager pm = (PowerManager) getSystemService(MyContext.POWER_SERVICE);
+//            this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+//            this.mWakeLock.acquire();
+//        }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//
+//        if (requestCode == REQUEST_WAKE_LOCK) {
+//            // Received permission result for WAKE_LOCK permission.
+//            Log.i(TAG, "Received response for WAKE_LOCK permission request.");
+//
+//            // Check if the only required permission has been granted
+//            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // WAKE_LOCK permission has been granted
+//            } else {
+//                Log.i(TAG, "WAKE_LOCK permission was NOT granted.");
+//            }
+//        } else {
+//            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+//    }
+//
+//    public interface MyState {
+//        void doAction(MyContext myContext, View view);
+//    }
+//    public class MyContext {
+//        private MyState myState;
+//
+//        public MyContext() {
+//            myState = new UntouchState();
+//        }
+//
+//        public void setState(MyState myState) {
+//            this.myState = myState;
+//        }
+//
+//        public MyState getState() {
+//            return myState;
+//        }
+//    }
+//    public class UntouchState implements MyState {
+//        @Override
+//        public void doAction(MyContext myContext, View view) {
+//                System.out.println("------------------------Start state-----------------------");
+//                mChronometer.setBase(SystemClock.elapsedRealtime());
+//                mChronometer.start();
+//                myContext.setState(this);
+//        }
+//    }
+//    public class StartResumeState implements MyState {
+//
+//        @Override
+//        public void doAction(MyContext myContext, View view) {
+//            if (myContext.getState().getClass() == UntouchState.class) {
+//                System.out.println("------------------------StartResumeState state-----------------------");
+//                mChronometer.setBase(SystemClock.elapsedRealtime());
+//                mChronometer.start();
+//                restart.setEnabled(true);
+//                myContext.setState(this);
+//            }else{
+//                System.out.println("------------------------StartResumeState state-----------------------");
+//                long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+//                mChronometer.setBase(mChronometer.getBase() + intervalOnPause);
+//                mChronometer.start();
+//                myContext.setState(this);
+//            }
+//        }
+//    }
+//    public class StopedState implements MyState {
+//
+//        @Override
+//        public void doAction(MyContext myContext, View view) {
+//            System.out.println("------------------------Stoped state-----------------------");
+//            mChronometer.stop();
+//            mLastStopTime = SystemClock.elapsedRealtime();
+//            myContext.setState(this);
+//        }
+//    }
 }
