@@ -3,6 +3,7 @@
     <string name="app_name">Hockey Trainer</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="btnStartResume">Start/Resume</string>
-    <string name="btnRestart">Restart</string>
+    <string name="btnStop">Stop</string>
+    <string name="btnTrain">Train</string>
 
 </resources>

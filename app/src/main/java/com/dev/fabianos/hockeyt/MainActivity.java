@@ -1,80 +1,81 @@
 package com.dev.fabianos.hockeyt;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
-public class MainActivity extends Activity {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
-    RelativeLayout rl;
-    Chronometer mChronometer;
-    Button start, stop, restart;
-    private long mLastStopTime;
-    private boolean running = false;
-    private boolean stoped = true;
+
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    public final String SPINNER_VALUE = "com.dev.fabianos.hockeyt.SPINNER_VALUE";
+    public final String SPINNER2_VALUE = "com.dev.fabianos.hockeyt.SPINNER2_VALUE";
+
+    //    ---LOGGING---
+    private static final String TAG = "MyActivity";
+
+    Button start;
+    Spinner spinner, spinner2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rl = (RelativeLayout) findViewById(R.id.rl);
+        start = (Button) findViewById(R.id.bntStartTrainning);
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
 
-        start = (Button) findViewById(R.id.btnStartResume);
-        restart = (Button) findViewById(R.id.btnRestart);
+        Float[] spinnerValue = new Float[]{0.5F, 1F, 1.5F, 2F, 2.5F};
+        ArrayAdapter<Float> adapter = new ArrayAdapter<Float>(this, android.R.layout.simple_spinner_item,
+                spinnerValue);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
-        mChronometer = new Chronometer (MainActivity.this);
+        spinner2 = (Spinner) findViewById(R.id.spinner2);
+        spinner2.setOnItemSelectedListener(this);
+        Integer[] spinner2Value = new Integer[]{3, 4, 5};
+        ArrayAdapter<Integer> adapter2 = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item,
+                spinner2Value);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner2.setAdapter(adapter2);
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams
-                ((int) LayoutParams.WRAP_CONTENT, (int) LayoutParams.WRAP_CONTENT);
+    }
 
-        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        params.setMargins(0, 980, 0, 0);
-        mChronometer.setLayoutParams(params);
-        mChronometer.setTextSize((float) 50);
+    public void startTrainning(View view) {
+        Intent intent = new Intent(this, GameActivity.class);
+        float value = (float) spinner.getSelectedItem();
+        int value2 = (int) spinner2.getSelectedItem();
+        intent.putExtra(SPINNER_VALUE, value);
+        intent.putExtra(SPINNER2_VALUE,value2 );
+        startActivity(intent);
+    }
 
-        rl.addView(mChronometer);
-        restart.setEnabled(false);
+    ;
 
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if ( running == false ) {
-                    mChronometer.setBase(SystemClock.elapsedRealtime());
-                    mChronometer.start();
-                    running = true;
-                    stoped = false;
-                    restart.setEnabled(true);
-                }
-                else if( running == true && stoped == true){
-                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
-                    mChronometer.setBase( mChronometer.getBase() + intervalOnPause );
-                    mChronometer.start();
-                    stoped = false;
-                }else if (running == true && stoped == false){
-                    mChronometer.stop();
-                    mLastStopTime = SystemClock.elapsedRealtime();
-                    stoped = true;
-                }
-            }
-        });
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        parent.getItemAtPosition(position);
 
-        restart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                mChronometer.setBase(SystemClock.elapsedRealtime());
-                mLastStopTime=0;
-                mChronometer.start();
-                running = true;
-                stoped = false;
-            }
-        });
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        start.setEnabled(false);
     }
 }
