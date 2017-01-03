@@ -1,6 +1,5 @@
-package com.dev.fabianos.hockeyt;
+package com.dev.fabianos.hockeyt.states;
 
-import android.view.View;
 import android.widget.Chronometer;
 
 /**

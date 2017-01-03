@@ -1,4 +1,4 @@
-package com.dev.fabianos.hockeyt;
+package com.dev.fabianos.hockeyt.states;
 
 /**
  * Created by jmfabiano on 28/12/2016.

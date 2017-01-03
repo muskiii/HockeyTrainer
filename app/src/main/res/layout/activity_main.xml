@@ -1,44 +1,61 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rl"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#218BEF">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#eaeadb">
 
-    <TextView
-        android:id="@+id/txtViewTitle"
-        android:textColor="#C9FCE7"
-        android:textSize="40sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="@string/app_name" />
-
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtViewTitle"
+        android:layout_height="430dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
         <Button
-            android:id="@+id/btnStartResume"
+            android:text="@string/btnTrain"
+            android:shadowColor="#1b5f59"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btnStartResume"
-            android:layout_marginBottom="46dp"
-            android:layout_weight="1" />
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/bntStartTrainning"
+            android:onClick="startTrainning" />
 
-        <Button
-            android:id="@+id/btnRestart"
+        <Spinner
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            android:layout_below="@+id/txtViewTitle"
+            android:layout_toStartOf="@+id/txtViewTitle"
+            android:layout_marginTop="12dp"
+            android:layout_width="wrap_content"
+            android:minWidth="50dp" />
+
+        <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btnRestart"
-            android:layout_marginBottom="17dp"
-            android:layout_weight="1" />
+            android:id="@+id/spinner2"
+            android:minWidth="50dp"
+            android:layout_alignTop="@+id/spinner"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/txtViewTitle"
+        android:textColor="#16bd9d"
+        android:textSize="40sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
